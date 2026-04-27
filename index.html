@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What's Inside the Jeffrey?</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  body {
+    margin: 0;
+    padding: 20px 16px 28px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #ffffff;
+    color: #1B3A2F;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+ 
+  .widget {
+    width: 100%;
+    max-width: 520px;
+  }
+ 
+  .widget-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+ 
+  .widget-eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #D4A04A;
+    margin-bottom: 6px;
+  }
+ 
+  .widget-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1B3A2F;
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+ 
+  .widget-subtitle {
+    font-size: 13px;
+    color: #7A8B82;
+    line-height: 1.5;
+  }
+ 
+  /* Blunt visual */
+  .blunt-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 20px;
+    padding: 0 8px;
+  }
+ 
+  .blunt-cap {
+    width: 18px;
+    height: 28px;
+    background: #D4A04A;
+    border-radius: 4px 0 0 4px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+ 
+  .blunt-cap::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 40%;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px 0 0 0;
+  }
+ 
+  .blunt-wrap {
+    height: 36px;
+    flex: 1;
+    border-radius: 0;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    background: #c8a96a;
+  }
+ 
+  .blunt-segment {
+    height: 100%;
+    cursor: pointer;
+    transition: filter 0.2s ease, transform 0.15s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+ 
+  .blunt-segment:hover {
+    filter: brightness(1.12);
+    transform: scaleY(1.06);
+  }
+ 
+  .blunt-segment.active {
+    filter: brightness(1.18);
+    transform: scaleY(1.1);
+  }
+ 
+  .blunt-segment--flower {
+    width: 40%;
+    background: linear-gradient(135deg, #3d6b52 0%, #2a5040 50%, #1B3A2F 100%);
+  }
+ 
+  .blunt-segment--rosin {
+    width: 33%;
+    background: linear-gradient(135deg, #b8922a 0%, #D4A04A 50%, #c8912a 100%);
+  }
+ 
+  .blunt-segment--diamond {
+    width: 27%;
+    background: linear-gradient(135deg, #c8d8cc 0%, #a8c4b0 50%, #88a898 100%);
+  }
+ 
+  .blunt-segment-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.55);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+ 
+  .blunt-tip {
+    width: 22px;
+    height: 36px;
+    background: linear-gradient(to right, #e8d5b0, #f0e0c0);
+    border-radius: 0 10px 10px 0;
+    flex-shrink: 0;
+  }
+ 
+  /* Layer labels */
+  .layer-labels {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+ 
+  .layer-btn {
+    flex: 1;
+    padding: 10px 8px;
+    border: 1.5px solid rgba(27,58,47,0.15);
+    border-radius: 10px;
+    background: #ffffff;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    overflow: hidden;
+  }
+ 
+  .layer-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #1B3A2F;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    border-radius: 9px;
+  }
+ 
+  .layer-btn.active::before { opacity: 1; }
+  .layer-btn.seen:not(.active) { border-color: rgba(27,58,47,0.4); }
+ 
+  .layer-btn-icon {
+    font-size: 18px;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+    display: block;
+  }
+ 
+  .layer-btn-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #1B3A2F;
+    position: relative;
+    z-index: 1;
+    transition: color 0.2s ease;
+    line-height: 1.2;
+    display: block;
+  }
+ 
+  .layer-btn.active .layer-btn-label { color: #ffffff; }
+ 
+  /* Info panel */
+  .info-panel {
+    border-radius: 12px;
+    overflow: hidden;
+    min-height: 80px;
+    transition: all 0.3s ease;
+  }
+ 
+  .info-card {
+    display: none;
+    padding: 18px 20px;
+    animation: slideIn 0.25s ease;
+  }
+ 
+  .info-card.visible { display: block; }
+ 
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+ 
+  .info-card--flower  { background: #1B3A2F; color: #ffffff; }
+  .info-card--rosin   { background: #f5f0e8; color: #1B3A2F; }
+  .info-card--diamond { background: #edf3ef; color: #1B3A2F; }
+ 
+  .info-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+ 
+  .info-card-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+ 
+  .info-card-name {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+ 
+  .info-card-role {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.65;
+    margin-top: 2px;
+  }
+ 
+  .info-card-body {
+    font-size: 13px;
+    line-height: 1.6;
+    opacity: 0.9;
+  }
+ 
+  /* Empty state */
+  .info-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    padding: 24px 16px;
+    text-align: center;
+    border: 1.5px dashed rgba(27,58,47,0.2);
+    border-radius: 12px;
+  }
+ 
+  .info-empty-icon { font-size: 24px; }
+  .info-empty-text { font-size: 13px; color: #7A8B82; }
+ 
+  /* Unlocked state */
+  .unlock-banner {
+    display: none;
+    margin-top: 14px;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #1B3A2F, #2a5040);
+    border-radius: 12px;
+    text-align: center;
+    animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+ 
+  .unlock-banner.visible { display: block; }
+ 
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+ 
+  .unlock-text {
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+ 
+  .unlock-cta {
+    display: inline-block;
+    background: #D4A04A;
+    color: #1B3A2F;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    padding: 9px 20px;
+    border-radius: 20px;
+    transition: filter 0.2s ease;
+  }
+ 
+  .unlock-cta:hover { filter: brightness(1.08); }
+ 
+  /* Progress dots */
+  .progress-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+  }
+ 
+  .progress-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(27,58,47,0.15);
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+ 
+  .progress-dot.filled {
+    background: #D4A04A;
+    transform: scale(1.2);
+  }
+ 
+  .progress-label {
+    font-size: 11px;
+    color: #7A8B82;
+    margin-left: 4px;
+  }
+</style>
+</head>
+<body>
+ 
+<div class="widget">
+ 
+  <div class="widget-header">
+    <p class="widget-eyebrow">Interactive</p>
+    <h2 class="widget-title">What's Inside the Jeffrey?</h2>
+    <p class="widget-subtitle">Tap each section to explore what makes this blunt hit different.</p>
+  </div>
+ 
+  <!-- Visual blunt diagram -->
+  <div class="blunt-visual">
+    <div class="blunt-cap"></div>
+    <div class="blunt-wrap">
+      <div class="blunt-segment blunt-segment--flower"  data-layer="flower"  onclick="selectLayer('flower')" title="THCa Flower">
+        <span class="blunt-segment-dot"></span>
+      </div>
+      <div class="blunt-segment blunt-segment--rosin"   data-layer="rosin"   onclick="selectLayer('rosin')"  title="Live Rosin">
+        <span class="blunt-segment-dot"></span>
+      </div>
+      <div class="blunt-segment blunt-segment--diamond" data-layer="diamond" onclick="selectLayer('diamond')" title="THCa Diamond Dust">
+        <span class="blunt-segment-dot"></span>
+      </div>
+    </div>
+    <div class="blunt-tip"></div>
+  </div>
+ 
+  <!-- Button row -->
+  <div class="layer-labels">
+    <button class="layer-btn" id="btn-flower"  onclick="selectLayer('flower')"  aria-label="THCa Flower">
+      <span class="layer-btn-icon">🌿</span>
+      <span class="layer-btn-label">THCa<br>Flower</span>
+    </button>
+    <button class="layer-btn" id="btn-rosin"   onclick="selectLayer('rosin')"   aria-label="Live Rosin">
+      <span class="layer-btn-icon">🍯</span>
+      <span class="layer-btn-label">Live<br>Rosin</span>
+    </button>
+    <button class="layer-btn" id="btn-diamond" onclick="selectLayer('diamond')" aria-label="THCa Diamond Dust">
+      <span class="layer-btn-icon">💎</span>
+      <span class="layer-btn-label">Diamond<br>Dust</span>
+    </button>
+  </div>
+ 
+  <!-- Info panel -->
+  <div class="info-panel" id="info-panel">
+ 
+    <div class="info-empty" id="empty-state">
+      <span class="info-empty-icon">👆</span>
+      <span class="info-empty-text">Tap a section above to explore the ingredients.</span>
+    </div>
+ 
+    <div class="info-card info-card--flower" id="card-flower">
+      <div class="info-card-header">
+        <span class="info-card-icon">🌿</span>
+        <div>
+          <div class="info-card-name">THCa Flower</div>
+          <div class="info-card-role">The Backbone</div>
+        </div>
+      </div>
+      <p class="info-card-body">The foundation of every Jeffrey. We packed it with a Face Mints × Biscotti × Sherbert hybrid — a complex, terpene-rich flower with earthy depth and notes of pine and sweet cream. It's what gives the Jeffrey its structure and staying power.</p>
+    </div>
+ 
+    <div class="info-card info-card--rosin" id="card-rosin">
+      <div class="info-card-header">
+        <span class="info-card-icon">🍯</span>
+        <div>
+          <div class="info-card-name">Live Rosin</div>
+          <div class="info-card-role">The Amplifier</div>
+        </div>
+      </div>
+      <p class="info-card-body">Solventless, small-batch, and seriously potent. Live rosin is extracted from fresh-frozen flower at low temps to preserve the full terpene profile — giving every hit a rich, layered flavor that regular infused pre-rolls can't touch.</p>
+    </div>
+ 
+    <div class="info-card info-card--diamond" id="card-diamond">
+      <div class="info-card-header">
+        <span class="info-card-icon">💎</span>
+        <div>
+          <div class="info-card-name">THCa Diamond Dust</div>
+          <div class="info-card-role">The Finisher</div>
+        </div>
+      </div>
+      <p class="info-card-body">Crystalline THCa concentrate ground into a fine dust and coated across the blunt. Diamonds are among the purest forms of THCa you can find — and that coating means every section of the Jeffrey burns with extra intensity, from first light to final ash.</p>
+    </div>
+ 
+  </div>
+ 
+  <!-- Progress row -->
+  <div class="progress-row">
+    <span class="progress-dot" id="dot-flower"></span>
+    <span class="progress-dot" id="dot-rosin"></span>
+    <span class="progress-dot" id="dot-diamond"></span>
+    <span class="progress-label" id="progress-label">0 of 3 explored</span>
+  </div>
+ 
+  <!-- Unlock banner -->
+  <div class="unlock-banner" id="unlock-banner">
+    <p class="unlock-text">You've explored the full Jeffrey. Three premium ingredients, one legendary blunt.</p>
+    <a class="unlock-cta" href="https://mood.com/product/jeffrey" target="_blank" rel="noopener">Shop the Jeffrey →</a>
+  </div>
+ 
+</div>
+ 
+<script>
+  var seen = { flower: false, rosin: false, diamond: false };
+  var active = null;
+ 
+  function selectLayer(layer) {
+    // Toggle off if already active
+    if (active === layer) {
+      deactivateAll();
+      active = null;
+      document.getElementById('empty-state').style.display = 'flex';
+      return;
+    }
+ 
+    active = layer;
+    seen[layer] = true;
+ 
+    // Hide empty state
+    document.getElementById('empty-state').style.display = 'none';
+ 
+    // Update cards
+    ['flower', 'rosin', 'diamond'].forEach(function(l) {
+      var card = document.getElementById('card-' + l);
+      card.classList.remove('visible');
+    });
+    document.getElementById('card-' + layer).classList.add('visible');
+ 
+    // Update buttons
+    ['flower', 'rosin', 'diamond'].forEach(function(l) {
+      var btn = document.getElementById('btn-' + l);
+      btn.classList.remove('active');
+      if (seen[l]) btn.classList.add('seen');
+    });
+    document.getElementById('btn-' + layer).classList.add('active');
+ 
+    // Update blunt segments
+    document.querySelectorAll('.blunt-segment').forEach(function(seg) {
+      seg.classList.remove('active');
+    });
+    document.querySelector('[data-layer="' + layer + '"]').classList.add('active');
+ 
+    // Update progress
+    updateProgress();
+  }
+ 
+  function deactivateAll() {
+    ['flower', 'rosin', 'diamond'].forEach(function(l) {
+      document.getElementById('card-' + l).classList.remove('visible');
+      document.getElementById('btn-' + l).classList.remove('active');
+    });
+    document.querySelectorAll('.blunt-segment').forEach(function(seg) {
+      seg.classList.remove('active');
+    });
+    document.getElementById('empty-state').style.display = 'flex';
+  }
+ 
+  function updateProgress() {
+    var count = 0;
+    ['flower', 'rosin', 'diamond'].forEach(function(l) {
+      var dot = document.getElementById('dot-' + l);
+      if (seen[l]) {
+        dot.classList.add('filled');
+        count++;
+      }
+    });
+ 
+    var label = document.getElementById('progress-label');
+    label.textContent = count + ' of 3 explored';
+ 
+    if (count === 3) {
+      document.getElementById('unlock-banner').classList.add('visible');
+      label.textContent = 'All 3 explored ✓';
+    }
+  }
+</script>
+</body>
+</html>
